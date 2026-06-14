@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { Artist } from '../../helpers/types';
 
 test('GET /artist/27 (Daft Punk) retourne status 200 avec les champs id, name, picture, nb_album, nb_fan', async ({
   request,
@@ -8,13 +9,13 @@ test('GET /artist/27 (Daft Punk) retourne status 200 avec les champs id, name, p
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('application/json');
 
-  const body = await response.json();
+  const body: Artist = await response.json();
 
-  expect(body).toHaveProperty('id');
-  expect(body).toHaveProperty('name');
-  expect(body).toHaveProperty('picture');
-  expect(body).toHaveProperty('nb_album');
-  expect(body).toHaveProperty('nb_fan');
+  expect(body.id).toBeDefined();
+  expect(body.name).toBeDefined();
+  expect(body.picture).toBeDefined();
+  expect(body.nb_album).toBeDefined();
+  expect(body.nb_fan).toBeDefined();
 });
 
 test('GET /artist/27 retourne un nb_fan supérieur à 0', async ({ request }) => {
@@ -23,7 +24,7 @@ test('GET /artist/27 retourne un nb_fan supérieur à 0', async ({ request }) =>
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('application/json');
 
-  const body = await response.json();
+  const body: Artist = await response.json();
   expect(body.nb_fan).toBeGreaterThan(0);
 });
 

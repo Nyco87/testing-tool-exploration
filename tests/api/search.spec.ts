@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { SearchResponse, Track } from '../../helpers/types';
 
 test('GET /search?q=daftpunk retourne un status 200 et un tableau data non vide', async ({
   request,
@@ -10,7 +11,7 @@ test('GET /search?q=daftpunk retourne un status 200 et un tableau data non vide'
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('application/json');
 
-  const body = await response.json();
+  const body: SearchResponse = await response.json();
   expect(body.data).toBeInstanceOf(Array);
   expect(body.data.length).toBeGreaterThan(0);
 });
@@ -25,12 +26,12 @@ test('GET /search?q=daftpunk retourne des objets avec les champs id, title, arti
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('application/json');
 
-  const body = await response.json();
-  const firstResult = body.data[0];
+  const body: SearchResponse = await response.json();
+  const firstResult: Track = body.data[0];
 
-  expect(firstResult).toHaveProperty('id');
-  expect(firstResult).toHaveProperty('title');
-  expect(firstResult).toHaveProperty('artist');
+  expect(firstResult.id).toBeDefined();
+  expect(firstResult.title).toBeDefined();
+  expect(firstResult.artist).toBeDefined();
 });
 
 test('GET /search?q=zzzzinexistant retourne un status 200 avec un tableau data vide', async ({
@@ -43,7 +44,7 @@ test('GET /search?q=zzzzinexistant retourne un status 200 avec un tableau data v
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('application/json');
 
-  const body = await response.json();
+  const body: SearchResponse = await response.json();
   expect(body.data).toBeInstanceOf(Array);
   expect(body.data).toHaveLength(0);
 });
