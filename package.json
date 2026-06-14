@@ -1,0 +1,23 @@
+{
+  "name": "testing-tool-exploration",
+  "version": "1.0.0",
+  "description": "Personal exploration of new tools and way of testing",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nyco87/testing-tool-exploration.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Nyco87/testing-tool-exploration/issues"
+  },
+  "homepage": "https://github.com/Nyco87/testing-tool-exploration#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.9.3"
+  }
+}
