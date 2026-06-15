@@ -59,6 +59,10 @@ export interface Album {
   release_date?: string;
   /** Nombre de morceaux de l'album (présent uniquement sur l'objet album complet). */
   nb_tracks?: number;
+  /** Liste des tracks de l'album. */
+  tracks: {
+    data: Track[];
+  }
 }
 
 /**
