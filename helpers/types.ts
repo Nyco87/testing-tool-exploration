@@ -79,3 +79,14 @@ export interface SearchResponse {
   /** URL de la page précédente (absente sur la première page). */
   prev?: string;
 }
+
+/** 
+ * Réponse avec une erreur de l'api.
+ */
+export interface DeezerError {
+  error: {
+    type: string;
+    message: string;
+    code: number;
+  };
+}
