@@ -20,6 +20,7 @@
     "@types/node": "^25.9.3"
   },
   "dependencies": {
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "zod": "^4.4.3"
   }
 }
