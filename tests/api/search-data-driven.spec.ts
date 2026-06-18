@@ -1,11 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { SearchResponse, DeezerError } from '../../helpers/types';
+import searchData from '../../fixtures/search-cases.json'; 
 
-[
-    {query: `daft punk`, minResults: 10},
-    {query: `154651154alaphafa`, minResults: 0},
-    {query: `Björk`, minResults: 1},
-].forEach (({query, minResults}) => {
+searchData.forEach (({ query, minResults}) => {
     test(`GET /search?q="${query}" retourne un status 200 avec ${minResults} résultats`, 
     async ({ request}) => {
         const response = await request.get('/search', {
