@@ -1,8 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { SearchResponse, DeezerError } from '../../helpers/types';
 import { SearchResponseSchema } from '../../helpers/schemas';
-import searchData from '../../fixtures/search-cases.json'; 
+import searchCases from '../../fixtures/search-cases.json';
+import aiSearchCase from '../../fixtures/ai-generated-search-cases.json' 
 import { step } from 'allure-js-commons';
+
+const searchData = [...searchCases, ...aiSearchCase]
 
 searchData.forEach (({ query, minResults}) => {
     test(`GET /search?q="${query}" retourne un status 200 avec ${minResults} résultats`, 

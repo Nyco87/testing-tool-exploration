@@ -8,10 +8,12 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "resolveJsonModule": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "types": ["node"]
   },
   "include": [
     "tests/**/*.ts",
-    "helpers/**/*.ts"
+    "helpers/**/*.ts",
+    "scripts/**/*.ts"
   ]
 }
