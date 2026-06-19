@@ -8,14 +8,9 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   timeout: 10_000,
   reporter: [
-    ['html', 
-      { 
-        open: 'never' 
-      }
-    ], 
-    [
-      'list'
-    ]
+    ['html', { open: 'never' }],
+    ['list'],
+    ['allure-playwright'],
   ],
   use: {
     baseURL: 'https://api.deezer.com',

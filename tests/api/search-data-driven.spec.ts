@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { SearchResponse, DeezerError } from '../../helpers/types';
 import { SearchResponseSchema } from '../../helpers/schemas';
 import searchData from '../../fixtures/search-cases.json'; 
+import { step } from 'allure-js-commons';
 
 searchData.forEach (({ query, minResults}) => {
     test(`GET /search?q="${query}" retourne un status 200 avec ${minResults} résultats`, 
@@ -10,16 +11,30 @@ searchData.forEach (({ query, minResults}) => {
             params: { q: query },
         });
 
-        expect(response.status()).toBe(200);
-        expect(response.headers()['content-type']).toContain('application/json');
+        await step(`Vérifier le statut 200`, async () => {
+            expect(response.status()).toBe(200);
+        });
+
+        await step('Vérifier que la réponse est un json', async () => {
+            expect(response.headers()['content-type']).toContain('application/json');
+        })
 
         const body: SearchResponse = await response.json();
-        const result = SearchResponseSchema.safeParse(body);
-        expect(result.success).toBe(true);
-        expect(body.data.length).toBeGreaterThanOrEqual(minResults);
+
+        await step('Vérifier le schéma de la réponse est correct', async () => {
+            const result = SearchResponseSchema.safeParse(body);
+            expect(result.success).toBe(true);
+        })
+
+        await step(`Vérifier que le nombre de résultat est supérieur à ${minResults}`, async () => {
+            expect(body.data.length).toBeGreaterThanOrEqual(minResults);
+        })
+        
         if (minResults > 0) {
-            expect(body.data[0].id).toBeDefined();
-            expect(body.data[0].title).toBeDefined();
+            await step('Vérifier la présence d\'un id et d\'un titre dans le premier résultat', async () => {
+                expect(body.data[0].id).toBeDefined();
+                expect(body.data[0].title).toBeDefined();
+            })
         }
     }
     )});
@@ -30,10 +45,23 @@ searchData.forEach (({ query, minResults}) => {
             params: { q: '' },
           });
       
-          expect(response.status()).toBe(200);
-      
+          await step(`Vérifier le statut 200`, async () => {
+                expect(response.status()).toBe(200);
+          });      
+
+
           const body: DeezerError = await response.json();
-          expect(body.error.type).toBe('ParameterException');
-          expect(body.error.message).toBe('empty parameter');
-          expect(body.error.code).toBe(500);
+
+          const errorType = 'ParameterException';
+          const errorMessage = 'empty parameter';
+
+          await step(`Vérifier que le type d'erreur est "${errorType}"`, async () => {
+            expect(body.error.type).toBe(errorType);
+          })
+          await step(`Vérifier que le message d'erreur est "${errorMessage}"`, async () => {
+            expect(body.error.message).toBe(errorMessage);
+          })
+          await step(`Vérifier que le code erreur est 500`, async () => {
+            expect(body.error.code).toBe(500);
+        })
       });
