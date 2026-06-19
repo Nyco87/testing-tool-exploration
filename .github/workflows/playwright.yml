@@ -21,6 +21,7 @@ jobs:
       with:
         name: ai-fixtures
         path: fixtures/ai-generated-search-cases.json
+        retention-days: 15
   playwright-test:
     needs: generate-fixtures
     timeout-minutes: 15
@@ -45,6 +46,7 @@ jobs:
       with:
         name: allure-results
         path: allure-results/
+        retention-days: 15
   publish-report:
     needs: playwright-test
     timeout-minutes: 15
