@@ -122,4 +122,11 @@ pour la search. Tu peux en proposer des nouveaux.
 
 La réponse du LLM est systématiquement validée par Zod avant écriture sur disque — l'IA génère, le schéma valide. Le script est intégré en premier job du pipeline CI, avant l'exécution des tests.
 
-> Stack IA utilisée : Claude (Anthropic) — modèle Sonnet
+## 📈 Métriques
+
+Les métriques du projet (couverture d'endpoints, temps de réponse, fixtures générées) sont suivies dans [METRICS.md](./METRICS.md).
+
+> Stack IA utilisée :
+> Claude (Anthropic) — modèle Sonnet
+> Cursor AI — modèle Composer 2.5
+> Copilot (Microsoft) — modèle Smart
