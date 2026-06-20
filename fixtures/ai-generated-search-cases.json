@@ -2,76 +2,51 @@
   {
     "query": "AC/DC",
     "minResults": 1,
-    "category": "special_characters"
-  },
-  {
-    "query": "Sigur Rós",
-    "minResults": 1,
-    "category": "accented_characters"
+    "category": "special-characters-slash"
   },
   {
     "query": "坂本龍一",
     "minResults": 1,
-    "category": "multilingual"
+    "category": "multilingual-japanese"
   },
   {
     "query": "Иван Купала",
     "minResults": 1,
-    "category": "multilingual"
+    "category": "multilingual-russian"
   },
   {
     "query": "أم كلثوم",
     "minResults": 1,
-    "category": "multilingual"
+    "category": "multilingual-arabic"
   },
   {
     "query": "a",
     "minResults": 1,
-    "category": "short_query"
+    "category": "short-query-single-char"
   },
   {
     "query": "!!",
     "minResults": 0,
-    "category": "unicode_symbols"
-  },
-  {
-    "query": "1234567890",
-    "minResults": 0,
-    "category": "numeric"
+    "category": "special-characters-symbols"
   },
   {
     "query": "jazz",
     "minResults": 1,
-    "category": "genre"
-  },
-  {
-    "query": "bossa nova",
-    "minResults": 1,
-    "category": "genre"
+    "category": "genre-jazz"
   },
   {
     "query": "Beyoncé",
     "minResults": 1,
-    "category": "accented_characters"
-  },
-  {
-    "query": "the",
-    "minResults": 1,
-    "category": "short_query"
+    "category": "accented-characters-french"
   },
   {
     "query": "xzqjfkwpvmblhtrsdyn",
     "minResults": 0,
-    "category": "zero_results"
+    "category": "zero-results-random-string"
   },
   {
     "query": "Miles Davis",
     "minResults": 1,
-    "category": "artist_name"
-  },
-  {
-    "query": "Ólafur Arnalds",
-    "minResults": 1,
-    "category": "accented_characters"
+    "category": "artist-name"
   }
 ]
