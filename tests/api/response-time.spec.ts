@@ -1,3 +1,4 @@
+import { label } from 'allure-js-commons';
 import {test, expect} from '@playwright/test';
 import { SearchResponse, Artist, Album } from '../../helpers/types';
 
@@ -5,7 +6,7 @@ const MAX_RESPONSE_TIME_MS = 300;
 
 test(`Response time for endpoint /search is below ${MAX_RESPONSE_TIME_MS}ms`, 
     async ({request}) => {
-
+        await label('AS_ID', 'API-response-time-SCH-003');
         const start = Date.now();
         const response = await request.get('/search', {
             params: { q: 'Mylène Farmer' }
@@ -38,6 +39,7 @@ test(`Response time for endpoint /search is below ${MAX_RESPONSE_TIME_MS}ms`,
  */
 
 test(`Response time for endpoint /artist is below ${MAX_RESPONSE_TIME_MS}ms`, async ({ request }) => {
+    await label('AS_ID', 'API-response-time-ART-002');
     const start = Date.now();
     const response = await request.get('/artist/1935');
     const duration = Date.now() - start;
@@ -54,6 +56,7 @@ test(`Response time for endpoint /artist is below ${MAX_RESPONSE_TIME_MS}ms`, as
 });
 
 test(`Response time for endpoint /album is below ${MAX_RESPONSE_TIME_MS}ms`, async ({ request }) => {
+    await label('AS_ID', 'API-response-time-ALB-001');
     const start = Date.now();
     const response = await request.get('/album/6287633');
     const duration = Date.now() - start;

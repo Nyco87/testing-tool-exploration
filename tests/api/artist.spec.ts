@@ -1,3 +1,4 @@
+import { label } from 'allure-js-commons';
 import { test, expect } from '@playwright/test';
 import { Artist } from '../../helpers/types';
 
@@ -31,6 +32,7 @@ test('GET /artist/27 retourne un nb_fan supérieur à 0', async ({ request }) =>
 test('GET /artist/999999999 retourne status 200 avec un champ error contenant un message', async ({
   request,
 }) => {
+  await label('AS_ID', 'API-artist-ART-001');
   const response = await request.get('/artist/999999999');
 
   expect(response.status()).toBe(200);

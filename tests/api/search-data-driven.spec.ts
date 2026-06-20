@@ -3,13 +3,14 @@ import { SearchResponse, DeezerError } from '../../helpers/types';
 import { SearchResponseSchema } from '../../helpers/schemas';
 import searchCases from '../../fixtures/search-cases.json';
 import aiSearchCase from '../../fixtures/ai-generated-search-cases.json' 
-import { step } from 'allure-js-commons';
+import {step, label} from 'allure-js-commons';
 
 const searchData = [...searchCases, ...aiSearchCase]
 
-searchData.forEach (({ query, minResults}) => {
+searchData.forEach (({ query, minResults, category}) => {
     test(`GET /search?q="${query}" retourne un status 200 avec ${minResults} résultats`, 
     async ({ request}) => {
+        await label('AS_ID', `API-search-data-driven-SCH-${category}`);
         const response = await request.get('/search', {
             params: { q: query },
         });
@@ -44,6 +45,7 @@ searchData.forEach (({ query, minResults}) => {
 
     test('GET /search?q="" retourne une erreur 500 avec ParameterException', 
         async ({ request }) => {
+          await label('AS_ID', 'API-search-data-driven-SCH-001');
           const response = await request.get('/search', {
             params: { q: '' },
           });

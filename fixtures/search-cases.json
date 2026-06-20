@@ -1,5 +1,5 @@
 [
-    { "query": "daft punk", "minResults": 10 },
-    { "query": "Björk", "minResults": 1 },
-    { "query": "154651154alaphafa", "minResults": 0 }
+    { "query": "daft punk", "minResults": 10, "category": "famous_result_001"},
+    { "query": "Björk", "minResults": 1, "category": "famous_result_002" },
+    { "query": "154651154alaphafa", "minResults": 0, "category": "no_result" }
   ]

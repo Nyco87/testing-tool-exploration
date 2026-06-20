@@ -6,7 +6,8 @@
   "scripts": {
     "test": "playwright test",
     "test:report": "allure generate allure-results --clean && allure open",
-    "generate:fixtures": "ts-node scripts/generate-fixtures.ts"
+    "generate:fixtures": "ts-node scripts/generate-fixtures.ts",
+    "analyze:specs": "ts-node scripts/analyze-specs.ts"
   },
   "repository": {
     "type": "git",
