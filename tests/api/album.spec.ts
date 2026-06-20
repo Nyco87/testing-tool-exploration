@@ -1,8 +1,10 @@
+import { label } from 'allure-js-commons';
 import { test, expect } from '@playwright/test';
 import { Album } from '../../helpers/types';
 
 test('GET /album/302127 (discovery) retourne status 200 avec les champs title, nb_tracks', 
     async ({ request }) => {
+    await label('AS_ID', 'API-album-ALB-001');
     const response = await request.get('/album/302127');
 
     expect(response.status()).toBe(200);
