@@ -126,7 +126,7 @@ La réponse du LLM est systématiquement validée par Zod avant écriture sur di
 
 Les métriques du projet (couverture d'endpoints, temps de réponse, fixtures générées) sont suivies dans [METRICS.md](./METRICS.md).
 
-> Stack IA utilisée :
-> Claude (Anthropic) — modèle Sonnet
-> Cursor AI — modèle Composer 2.5
-> Copilot (Microsoft) — modèle Smart
+> Stack IA utilisée :  
+> - Claude (Anthropic) — modèle Sonnet  
+> - Cursor AI — modèle Composer 2.5  
+> - Copilot (Microsoft) — modèle Smart  
