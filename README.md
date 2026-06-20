@@ -37,7 +37,8 @@ testing-tool-exploration/
 │   ├── types.ts                 # Interfaces TypeScript (Track, Artist, Album...)
 │   └── schemas.ts               # Schémas Zod pour validation des réponses
 ├── scripts/
-│   └── generate-fixtures.ts     # Script de génération de fixtures via LLM
+│   ├── generate-fixtures.ts     # Script de génération de fixtures via LLM
+│   └── analyze-specs.ts         # Détection et insertion automatique des allure.id()
 └── tests/
     └── api/
         ├── search.spec.ts               # Tests endpoint /search
@@ -65,15 +66,16 @@ npm test
 
 ## ⚙️ Pipeline CI/CD
 
-Le pipeline GitHub Actions est composé de 3 jobs chaînés :
+Le pipeline GitHub Actions est composé de 4 jobs chaînés :
 
 ```
-generate-fixtures → playwright-test → publish-report
+enforce-allure-ids → generate-fixtures → playwright-test → publish-report
 ```
 
-1. **generate-fixtures** — génère les cas de test via LLM et les passe au job suivant via artifact
-2. **playwright-test** — récupère les fixtures et exécute la suite de tests Playwright
-3. **publish-report** — génère le rapport Allure et le déploie sur GitHub Pages
+1. **enforce-allure-ids** — analyse les fichiers spec, insère automatiquement les `allure.id()` manquants et commite les modifications
+2. **generate-fixtures** — génère les cas de test via LLM et les passe au job suivant via artifact
+3. **playwright-test** — récupère les fixtures et exécute la suite de tests Playwright
+4. **publish-report** — génère le rapport Allure et le déploie sur GitHub Pages
 
 ## 📊 Rapport de test
 
