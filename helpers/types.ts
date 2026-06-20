@@ -10,7 +10,7 @@ export interface Track {
   /** Durée du morceau en secondes. */
   duration: number;
   /** Score de popularité du morceau. */
-  rank: number;
+  rank?: number;
   /** URL de l'extrait audio de 30 secondes (absent si aucun extrait n'est disponible). */
   preview?: string;
   /** Artiste associé au morceau (objet simplifié selon le contexte). */
@@ -62,7 +62,14 @@ export interface Album {
   /** Liste des tracks de l'album. */
   tracks: {
     data: Track[];
-  }
+  };
+}
+
+/**
+ * Réponse détaillée d'un morceau Deezer.
+ */
+export interface DeezerTrackDetail extends Track {
+  release_date: string;
 }
 
 /**

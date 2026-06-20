@@ -22,6 +22,7 @@ const ENDPOINT_MAP: Record<string, string> = {
   'artist': 'ART',
   'album': 'ALB',
   'chart': 'CHT',
+  'track': 'TRK',
 };
 
 const TYPE_MAP: Record<string, string> = {
