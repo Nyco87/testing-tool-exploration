@@ -213,6 +213,14 @@ function generateId(test: FoundTest, counter: number): string {
   return `${type}-${className}-${endpoint}-${num}`;
 }
 
+function getNextCounter(source: string, type: string, className: string): number {
+  const regex = new RegExp(`${type}-${className}-[A-Z]+-([0-9]{3})`, 'g');
+  const matches = [...source.matchAll(regex)];
+  if (matches.length === 0) return 1;
+  const max = Math.max(...matches.map(m => parseInt(m[1])));
+  return max + 1;
+}
+
 // ---------------------------------------------------------------------------
 // Insertion de allure.id() dans le fichier source
 // ---------------------------------------------------------------------------
@@ -238,7 +246,9 @@ async function insertAllureIds(filePath: string, tests: FoundTest[]): Promise<vo
   }
 
   // Compteur par fichier
-  let counter = 1;
+  const type = getTypeCode(filePath);
+  const className = getClassName(filePath);
+  let counter = getNextCounter(source, type, className);
 
   // Trier par ligne décroissante pour ne pas décaler les indices
   const missing = tests

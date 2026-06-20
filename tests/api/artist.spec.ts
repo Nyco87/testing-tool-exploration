@@ -5,7 +5,6 @@ import { Artist } from '../../helpers/types';
 test('GET /artist/27 (Daft Punk) retourne status 200 avec les champs id, name, picture, nb_album, nb_fan', async ({
   request,
 }) => {
-  await label('AS_ID', 'API-artist-ART-002');
   const response = await request.get('/artist/27');
 
   expect(response.status()).toBe(200);
@@ -21,7 +20,6 @@ test('GET /artist/27 (Daft Punk) retourne status 200 avec les champs id, name, p
 });
 
 test('GET /artist/27 retourne un nb_fan supérieur à 0', async ({ request }) => {
-  await label('AS_ID', 'API-artist-ART-001');
   const response = await request.get('/artist/27');
 
   expect(response.status()).toBe(200);
