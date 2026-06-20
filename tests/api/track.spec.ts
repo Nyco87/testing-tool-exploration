@@ -1,3 +1,4 @@
+import { label } from 'allure-js-commons';
 import { test, expect } from '@playwright/test';
 import { DeezerTrackDetailSchema } from '../../helpers/schemas';
 import type { DeezerTrackDetail } from '../../helpers/types';
@@ -23,6 +24,7 @@ import type { DeezerTrackDetail } from '../../helpers/types';
  */
 
 test('GET /track/1255632982 retourne des objets avec les champs attendus', async ({ request }) => {
+  await label('AS_ID', 'API-track-TRK-001');
   const response = await request.get('/track/1255632982');
 
   expect(response.status()).toBe(200);
