@@ -23,6 +23,7 @@ jobs:
     - name: Enforce Allure IDs
       run: npx ts-node scripts/analyze-specs.ts
     - name: Create PR for missing Allure IDs
+      id: create-pr
       uses: peter-evans/create-pull-request@v7
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -31,6 +32,12 @@ jobs:
         body: "Automatic insertion of missing Allure IDs by the CI pipeline."
         branch: "chore/allure-ids"
         delete-branch: true
+    - name: Approve and merge PR
+      if: steps.create-pr.outputs.pull-request-number != ''
+      run: |
+        gh pr merge chore/allure-ids --squash --auto
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   generate-fixtures:
     needs: enforce-allure-ids
     timeout-minutes: 15
