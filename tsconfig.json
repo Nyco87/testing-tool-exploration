@@ -12,6 +12,7 @@
     "types": ["node"]
   },
   "include": [
+    "*.ts",
     "tests/**/*.ts",
     "helpers/**/*.ts",
     "scripts/**/*.ts"

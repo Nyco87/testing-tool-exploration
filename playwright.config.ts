@@ -1,7 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './tests/api',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -12,15 +11,33 @@ export default defineConfig({
     ['list'],
     ['allure-playwright'],
   ],
-  use: {
-    baseURL: 'https://api.deezer.com',
-    extraHTTPHeaders: {
-      'Accept': 'application/json',
-    },
-  },
   projects: [
     {
+      name: 'setup',
+      testDir: './tests/e2e',
+      testMatch: /auth\.setup\.ts/,
+      timeout: 60_000,
+    },
+    {
       name: 'api',
+      testDir: './tests/api',
+      use: {
+        baseURL: 'https://api.deezer.com',
+        extraHTTPHeaders: {
+          'Accept': 'application/json',
+        },
+      },
+    },
+    {
+      name: 'e2e',
+      testDir: './tests/e2e',
+      testMatch: /.*\.spec\.ts/,
+      dependencies: ['setup'],
+      use: {
+        baseURL: 'https://www.deezer.com',
+        storageState: 'auth/session.json',
+        navigationTimeout: 30_000,
+      },
     },
   ],
 });
