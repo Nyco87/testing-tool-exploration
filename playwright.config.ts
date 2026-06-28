@@ -33,10 +33,16 @@ export default defineConfig({
       testDir: './tests/e2e',
       testMatch: /.*\.spec\.ts/,
       dependencies: ['setup'],
+      timeout: 20_000,
       use: {
         baseURL: 'https://www.deezer.com',
         storageState: 'auth/session.json',
         navigationTimeout: 30_000,
+        viewport: { width: 1920, height: 1080 },
+        deviceScaleFactor: 1,
+        launchOptions: {
+          args: ['--force-device-scale-factor=0.75']
+        },
       },
     },
   ],
