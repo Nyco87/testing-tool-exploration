@@ -4,6 +4,55 @@ const playlistName = `Playwright Test ${new Date().toISOString().replace(/[:.]/g
 const trackQuery = 'Du temps remix';
 let trackTitle = '';
 
+/**
+ * You are a Playwright TypeScript automation expert.
+
+## Context
+I am building an E2E test suite on deezer.com.
+The user session is already loaded via storageState in playwright.config.ts — no login needed in the spec.
+Use the following test as a reference for code style: [search-artist.spec.ts]
+
+## Test to implement
+File: tests/e2e/create-playlist-add-track.spec.ts
+
+Title: Create a playlist and add a track
+
+## Variables
+const playlistName = `Playwright Test ${new Date().toISOString().replace(/[:.]/g, '-')}`;
+const trackQuery = 'Daft Punk';
+These variables must be used in step labels and selectors where relevant.
+
+## Steps
+Step 1 - [Pre-requisit] User is logged in and home page is displayed
+Step 2 - [Action] Click on "Créer une playlist" button in sidebar
+Step 3 - [Result] A modal is displayed — if a choice modal appears (playlist vs AI playlist), select "playlist". The playlist creation modal is displayed.
+Step 4 - [Action] Select a cover, fill the title "${playlistName}" and confirm the creation
+Step 5 - [Result] The playlist is created — store the playlist ID from the current URL for later use
+Step 6 - [Action] Search for a track "${trackQuery}"
+Step 7 - [Result] Track results are displayed
+Step 8 - [Action] Open context menu of the first track in track results section and add it to "${playlistName}"
+Step 9 - [Result] The track is correctly added to the playlist — navigate to the stored playlist URL and verify the track is present
+
+## Known selectors
+- "Créer une playlist" button: getByRole('button', { name: 'Créer une playlist' })
+
+## Rules
+- Create one test.step() per step — never merge an Action and a Result in the same step
+- [Action] steps contain only Playwright interactions (click, fill, hover...)
+- [Result] steps contain only assertions (expect())
+- Use data-testid as first priority for selectors
+- If data-testid is not available, use getByRole() with aria-label
+- Never use CSS generated classes as selectors
+- For unique resource names, use timestamp-based variables
+
+## Screenshots
+[attach DOM screenshots for each screen involved in the test]
+
+Résultat: le prompt est efficace maisbeaucoup d'instabilité sur le choix des sélecteurs,
+beaucoup de retourches à faire pour que ça fonctionne. 
+La solution "screenshot" a montré ses limites sur un cas plus complexe. 
+ */
+
 test('Create a playlist and add a track', async ({ page }) => {
   let playlistUrl = '';
 

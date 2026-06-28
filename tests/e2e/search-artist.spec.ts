@@ -32,6 +32,8 @@ Contraintes :
 - Suis scrupuleusement l'ordre des steps
 
 [joins les screenshots]
+
+Résultat: j'ai eu juste besoin de retravailler les steps mais le test était green. 
  */
 
 test('Access to an Artist via the Search Best Result', async ({ page }) => {
