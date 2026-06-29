@@ -23,6 +23,12 @@ jobs:
     - uses: actions/upload-artifact@v7
       if: ${{ !cancelled() }}
       with:
+        name: debug-screenshots
+        path: test-results/login-page.png
+        retention-days: 5
+    - uses: actions/upload-artifact@v7
+      if: ${{ !cancelled() }}
+      with:
         name: allure-results-e2e
         path: allure-results/
         retention-days: 15

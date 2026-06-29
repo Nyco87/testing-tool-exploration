@@ -28,6 +28,7 @@ setup('authenticate', async ({ page }) => {
   await page.goto('https://account.deezer.com/login');
   await page.waitForLoadState('domcontentloaded');
   await handleCookies(page);
+  await page.screenshot({ path: 'test-results/login-page.png' });
   console.log('URL actuelle:', page.url());
 
   await page.locator('[data-testid="email-field"]').fill(email);
