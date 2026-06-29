@@ -1,0 +1,5 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","6609","Play Flow from home page","e2e","2026-06-29","passed","2026-06-29","","tests/e2e/flow.spec.ts","",""
+"","5750","Access to an Artist via the Search Best Result","e2e","2026-06-29","passed","2026-06-29","","tests/e2e/search-artist.spec.ts","",""
+"","11771","Create a playlist and add a track","e2e","2026-06-29","passed","2026-06-29","","tests/e2e/create-playlist-add-track.spec.ts","",""
+"","34130","authenticate","setup","2026-06-29","passed","2026-06-29","","tests/e2e/auth.setup.ts","",""
