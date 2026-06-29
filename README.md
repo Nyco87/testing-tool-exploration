@@ -1,4 +1,5 @@
 ![CI](https://github.com/Nyco87/testing-tool-exploration/actions/workflows/playwright.yml/badge.svg)
+![E2E](https://github.com/Nyco87/testing-tool-exploration/actions/workflows/e2e.yml/badge.svg)
 
 # testing-tool-exploration
 
@@ -15,10 +16,10 @@ Le sujet d'étude choisi est l'**API publique Deezer**. Ce choix est délibéré
 | Outil | Rôle |
 |---|---|
 | **TypeScript** | Typage strict, interfaces, schémas |
-| **Playwright** | Framework de test API (`request` fixture) |
+| **Playwright** | Framework de test API et E2E browser |
 | **Zod** | Validation de schéma des réponses API |
-| **GitHub Actions** | Pipeline CI/CD en 3 jobs chaînés |
-| **Allure** | Rapport de test publié sur GitHub Pages |
+| **GitHub Actions** | Pipelines CI/CD (API automatique + E2E manuel) |
+| **Allure** | Rapports de test publiés sur GitHub Pages |
 | **ts-node** | Exécution des scripts TypeScript sans compilation |
 
 ---
@@ -29,7 +30,12 @@ Le sujet d'étude choisi est l'**API publique Deezer**. Ce choix est délibéré
 testing-tool-exploration/
 ├── .github/
 │   └── workflows/
-│       └── playwright.yml       # Pipeline CI/CD (3 jobs)
+│       ├── playwright.yml       # Pipeline CI/CD API (automatique)
+│       └── e2e.yml              # Pipeline E2E (déclenchement manuel)
+├── auth/
+│   └── .gitkeep                 # Dossier pour session.json (ignoré par git)
+├── docs/
+│   └── e2e-test-prompt-template.md  # Prompt standard création test E2E
 ├── fixtures/
 │   ├── search-cases.json                  # Cas de test manuels
 │   └── ai-generated-search-cases.json     # Cas générés par IA
@@ -40,11 +46,19 @@ testing-tool-exploration/
 │   ├── generate-fixtures.ts     # Script de génération de fixtures via LLM
 │   └── analyze-specs.ts         # Détection et insertion automatique des allure.id()
 └── tests/
-    └── api/
-        ├── search.spec.ts               # Tests endpoint /search
-        ├── artist.spec.ts               # Tests endpoint /artist
-        ├── album.spec.ts                # Tests endpoint /album
-        └── search-data-driven.spec.ts   # Tests data-driven (fixtures JSON)
+    ├── api/
+    │   ├── search.spec.ts               # Tests endpoint /search
+    │   ├── artist.spec.ts               # Tests endpoint /artist
+    │   ├── album.spec.ts                # Tests endpoint /album
+    │   ├── chart.spec.ts                # Tests endpoint /chart
+    │   ├── track.spec.ts                # Tests endpoint /track
+    │   ├── response-time.spec.ts        # Tests temps de réponse
+    │   └── search-data-driven.spec.ts   # Tests data-driven (fixtures JSON)
+    └── e2e/
+        ├── auth.setup.ts                # Login + session (storageState)
+        ├── flow.spec.ts                 # Scénario : jouer le Flow depuis la home
+        ├── search-artist.spec.ts        # Scénario : rechercher un artiste
+        └── create-playlist-add-track.spec.ts  # Scénario : créer une playlist et ajouter une track
 ```
 
 ---
@@ -58,15 +72,20 @@ npm ci
 # Générer les fixtures IA (mock par défaut, brancher ANTHROPIC_API_KEY pour le mode réel)
 npm run generate:fixtures
 
-# Lancer les tests
+# Lancer les tests API
 npm test
+
+# Lancer les tests E2E (nécessite DEEZER_EMAIL et DEEZER_PASSWORD)
+DEEZER_EMAIL=xxx DEEZER_PASSWORD=xxx npx playwright test --project=setup --project=e2e
 ```
 
 ---
 
-## ⚙️ Pipeline CI/CD
+## ⚙️ Pipelines CI/CD
 
-Le pipeline GitHub Actions est composé de 4 jobs chaînés :
+### Pipeline API — automatique
+
+Déclenché sur chaque push et pull request sur `main`.
 
 ```
 enforce-allure-ids → generate-fixtures → playwright-test → publish-report
@@ -74,20 +93,38 @@ enforce-allure-ids → generate-fixtures → playwright-test → publish-report
 
 1. **enforce-allure-ids** — analyse les fichiers spec, insère automatiquement les `allure.id()` manquants et commite les modifications
 2. **generate-fixtures** — génère les cas de test via LLM et les passe au job suivant via artifact
-3. **playwright-test** — récupère les fixtures et exécute la suite de tests Playwright
+3. **playwright-test** — récupère les fixtures et exécute la suite de tests API Playwright
 4. **publish-report** — génère le rapport Allure et le déploie sur GitHub Pages
 
-## 📊 Rapport de test
+### Pipeline E2E — manuel
 
-[Voir le rapport Allure](https://nyco87.github.io/testing-tool-exploration/)
+Déclenché manuellement via `workflow_dispatch` (Actions → E2E Tests → Run workflow).
+
+```
+e2e-test → publish-e2e-report
+```
+
+1. **e2e-test** — login Deezer via storageState, exécute les 3 scénarios E2E
+2. **publish-e2e-report** — génère et déploie le rapport Allure E2E
+
+> Les tests E2E sont déclenchés manuellement pour éviter les faux positifs liés aux mécanismes anti-bot de Deezer (security check, détection d'IP).
+
+---
+
+## 📊 Rapports de test
+
+| Suite | Lien |
+|---|---|
+| **API** | [Rapport Allure API](https://nyco87.github.io/testing-tool-exploration/) |
+| **E2E** | [Rapport Allure E2E](https://nyco87.github.io/testing-tool-exploration/e2e/) |
 
 ---
 
 ## 🤖 AI-Assisted Testing
 
-Ce projet intègre l'IA générative comme outil d'assistance tout au long du processus de test, dans trois cas d'usage distincts.
+Ce projet intègre l'IA générative comme outil d'assistance tout au long du processus de test, dans quatre cas d'usage distincts.
 
-### 1. Génération de scripts de test
+### 1. Génération de scripts de test API
 
 Les specs de base ont été scaffoldées via prompt, en partant de la documentation de l'API Deezer. Exemple de prompt utilisé :
 
@@ -104,15 +141,38 @@ Ajouter un expect sur le Content-Type application/json.
 
 Le code généré a ensuite été revu, adapté et enrichi manuellement — typage TypeScript strict, validation Zod, organisation en helpers réutilisables.
 
-### 2. Assistance itérative au code
+### 2. Génération de scripts de test E2E
 
-L'IA a été utilisée en mode pair programming pour valider des choix d'implémentation : review de code, debugging TypeScript, conception du workflow GitHub Actions. L'approche privilégiée est de soumettre le code existant à l'IA pour critique plutôt que de lui demander de générer from scratch — ce qui permet de garder la maîtrise des décisions techniques.
+Les scénarios E2E ont été générés via un prompt standard reproductible, documenté dans [`docs/e2e-test-prompt-template.md`](./docs/e2e-test-prompt-template.md). Le process combine :
 
-### 3. Génération de fixtures de test
+- Conception des steps en format `[Action] / [Result]`
+- Inspection du DOM via Playwright Codegen et DevTools
+- Génération IA avec le prompt standard + screenshots
+- Review et validation manuelle
+
+Exemple de prompt pour le scénario "Access to an Artist via the Search Best Result" :
+
+```
+You are a Playwright TypeScript automation expert.
+I am building an E2E test suite on deezer.com.
+The user session is already loaded via storageState.
+
+Title: Access to an Artist via the Search Best Result
+
+Step 1 - [Pre-requisit] User is logged in and home page is displayed
+Step 2 - [Action] Search for artist "${artistName}"
+Step 3 - [Result] Search result page is displayed and artist is found as Best Result
+Step 4 - [Action] Click on Artist Best Result
+Step 5 - [Result] The right artist page is displayed
+```
+
+### 3. Assistance itérative au code
+
+L'IA a été utilisée en mode pair programming pour valider des choix d'implémentation : review de code, debugging TypeScript, conception des workflows GitHub Actions. L'approche privilégiée est de soumettre le code existant à l'IA pour critique plutôt que de lui demander de générer from scratch.
+
+### 4. Génération de fixtures de test
 
 Un script `scripts/generate-fixtures.ts` appelle un LLM pour générer des cas de recherche variés (multilingues, caractères spéciaux, edge cases, zero results...) à partir des schémas Zod existants.
-
-Prompt utilisé :
 
 ```
 A partir des schémas dans schemas.ts et de la fixture search-cases.json,
@@ -120,13 +180,15 @@ génère un script documenté qui permet de générer des cas de tests variés
 pour la search. Tu peux en proposer des nouveaux.
 ```
 
-La réponse du LLM est systématiquement validée par Zod avant écriture sur disque — l'IA génère, le schéma valide. Le script est intégré en premier job du pipeline CI, avant l'exécution des tests.
+La réponse du LLM est systématiquement validée par Zod avant écriture sur disque — l'IA génère, le schéma valide.
+
+---
 
 ## 📈 Métriques
 
 Les métriques du projet (couverture d'endpoints, temps de réponse, fixtures générées) sont suivies dans [METRICS.md](./METRICS.md).
 
-> Stack IA utilisée :  
-> - Claude (Anthropic) — modèle Sonnet  
-> - Cursor AI — modèle Composer 2.5  
-> - Copilot (Microsoft) — modèle Smart  
+> Stack IA utilisée :
+> - Claude (Anthropic) — modèle Sonnet
+> - Cursor AI — modèle Composer 2.5
+> - Copilot (Microsoft) — modèle Smart
