@@ -1,3 +1,4 @@
+import { label } from 'allure-js-commons';
 import { test, expect } from '@playwright/test';
 
 const playlistName = `Playwright Test ${new Date().toISOString().replace(/[:.]/g, '-')}`;
@@ -54,6 +55,7 @@ La solution "screenshot" a montré ses limites sur un cas plus complexe.
  */
 
 test('Create a playlist and add a track', async ({ page }) => {
+  await label('AS_ID', 'E2E-create-playlist-add-track-001');
   let playlistUrl = '';
 
   await test.step('[Pre-requisit] User is logged in and home page is displayed', async () => {

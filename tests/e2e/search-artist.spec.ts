@@ -1,3 +1,4 @@
+import { label } from 'allure-js-commons';
 import { test, expect } from '@playwright/test';
 
 const artistName = 'Mylène Farmer';
@@ -37,6 +38,7 @@ Résultat: j'ai eu juste besoin de retravailler les steps mais le test était gr
  */
 
 test('Access to an Artist via the Search Best Result', async ({ page }) => {
+  await label('AS_ID', 'E2E-search-artist-001');
   await test.step('[Pre-requisit] User is logged in and home page is displayed', async () => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');

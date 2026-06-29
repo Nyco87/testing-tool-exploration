@@ -27,6 +27,7 @@ const ENDPOINT_MAP: Record<string, string> = {
 
 const TYPE_MAP: Record<string, string> = {
   'api': 'API',
+  'e2e': 'E2E',
   'performance': 'PERF',
 };
 
@@ -202,11 +203,16 @@ function getClassName(filePath: string): string {
 
 function generateId(test: FoundTest, counter: number): string {
   const type = getTypeCode(test.file);
-  const endpoint = getEndpointCode(test.endpoint);
   const className = getClassName(test.file);
 
+  if (type === 'E2E') {
+    const num = String(counter).padStart(3, '0');
+    return `${type}-${className}-${num}`;
+  }
+
+  const endpoint = getEndpointCode(test.endpoint);
+
   if (test.insideForEach) {
-    // L'ID est partiellement statique — le ${category} est résolu au runtime
     return `${type}-${className}-${endpoint}-\${category}`;
   }
 
