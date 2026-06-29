@@ -1,7 +1,7 @@
 import { label } from 'allure-js-commons';
 import { test, expect } from '@playwright/test';
 
-test('should play Flow from home', async ({ page }) => {
+test('Play Flow from home page', async ({ page }) => {
   await label('AS_ID', 'E2E-flow-001');
   await page.goto('/');
   await page.waitForLoadState('domcontentloaded');
