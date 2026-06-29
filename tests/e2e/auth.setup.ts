@@ -8,7 +8,7 @@ async function handleCookies(page: Page): Promise<void> {
   try {
     await page.locator('[data-testid="gdpr-btn-refuse-all"]').click({ timeout: 3000 });
   } catch {
-    // banner absent, nothing to do
+    // No cookie screen, nothing to do
   }
 }
 
@@ -25,11 +25,18 @@ setup('authenticate', async ({ page }) => {
   await page.goto('https://www.deezer.com');
   await handleCookies(page);
 
-  await page.goto('https://account.deezer.com/login');
+  await page.goto('https://account.deezer.com/en-us/login/');
   await page.waitForLoadState('domcontentloaded');
   await handleCookies(page);
-  await page.screenshot({ path: 'test-results/login-page.png' });
-  console.log('URL actuelle:', page.url());
+
+  // CI (US server): login with phone number
+  // Click on "Log in with email address"
+  try {
+    await page.getByText('Log in with email address').click({ timeout: 5_000 });
+    await page.waitForLoadState('domcontentloaded');
+  } catch {
+    // EEmail field already visible (local EU environment)
+  }
 
   await page.locator('[data-testid="email-field"]').fill(email);
   await page.locator('[data-testid="password-field"]').fill(password);
@@ -43,7 +50,7 @@ setup('authenticate', async ({ page }) => {
     await securityCheck.waitFor({ timeout: 5_000 });
     hasSecurityCheck = true;
   } catch {
-    // pas de security check
+    // no security check
   }
 
   if (hasSecurityCheck) {
