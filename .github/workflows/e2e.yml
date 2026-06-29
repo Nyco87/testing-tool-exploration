@@ -1,0 +1,28 @@
+name: E2E Tests
+on:
+  workflow_dispatch:
+
+jobs:
+  e2e-test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v6
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run E2E setup + tests
+      run: npx playwright test --project=setup --project=e2e
+      env:
+        DEEZER_EMAIL: ${{ secrets.DEEZER_EMAIL }}
+        DEEZER_PASSWORD: ${{ secrets.DEEZER_PASSWORD }}
+    - uses: actions/upload-artifact@v7
+      if: ${{ !cancelled() }}
+      with:
+        name: allure-results-e2e
+        path: allure-results/
+        retention-days: 15
