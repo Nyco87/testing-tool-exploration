@@ -1,15 +1,21 @@
 import { label } from 'allure-js-commons';
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
+import { HomePage } from '../../pages/home-page';
 
 test('Play Flow from home page', async ({ page }) => {
   await label('AS_ID', 'E2E-flow-001');
-  await page.goto('/');
-  await page.waitForLoadState('domcontentloaded');
 
-  const flowCard = page.locator('[data-testid="flow-config-default"]');
-  await flowCard.scrollIntoViewIfNeeded();
-  await flowCard.hover();
-  await flowCard.getByRole('button', { name: 'Play' }).click();
+  const homePage = new HomePage(page);
 
-  await expect(flowCard.locator('[aria-label="Pause"]')).toBeVisible({ timeout: 10_000 });
+  await test.step('[Pre-requisit] User is logged in and home page is displayed', async () => {
+    await homePage.goto('/');
+  });
+
+  await test.step('[Action] Play Flow', async () => {
+    await homePage.playDefaultFlow();
+  });
+
+  await test.step('[Result] Flow is playing', async () => {
+    await homePage.expectFlowPlaying();
+  });
 });
