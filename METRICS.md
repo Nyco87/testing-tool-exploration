@@ -1,6 +1,6 @@
 # Metrics
 
-> Last updated: June 2026 — updated manually after each significant change.
+> Last updated: July 2026 — updated manually after each significant change.
 
 ## Test Suite
 
@@ -43,3 +43,28 @@
 | Manual fixtures | 3 |
 | Scripts powered by AI | 2 (`generate-fixtures.ts`, `analyze-specs.ts`) |
 | Allure IDs auto-generated | 25 |
+
+## E2E Test Suite — Page Object Model
+
+| Metric | Value |
+|---|---|
+| E2E spec files | 3 |
+| Page Objects created | 7 |
+| Total encapsulated methods | 22 |
+| Total encapsulated locators | 16 |
+| Raw selectors remaining in specs | 0 |
+| E2E test steps (`test.step()`) | 17 |
+
+### Page Objects breakdown
+
+| Page Object | Locators | Methods | Used in specs |
+|---|---|---|---|
+| `BasePage` | 0 | 1 | 3/3 (via inheritance) |
+| `HomePage` | 4 | 3 | 2/3 |
+| `SearchPage` | 4 | 7 | 2/3 |
+| `ArtistPage` | 0 | 1 | 1/3 |
+| `PlaylistCreationModal` | 4 | 4 | 1/3 |
+| `PlaylistPage` | 1 | 4 | 1/3 |
+| `TrackContextMenu` | 3 | 2 | 1/3 |
+
+> `SearchPage` est le Page Object le plus mutualisé (recherche, résultats artiste et tracks) — 3 méthodes y sont temporairement portées (`getFirstTrackTitle`, `openFirstTrackContextMenu`, `scrollToSearchResultsSection`) en attendant l'extraction d'une future `DataGridPage` dédiée à la grille de résultats.

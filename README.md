@@ -42,6 +42,14 @@ testing-tool-exploration/
 ├── helpers/
 │   ├── types.ts                 # Interfaces TypeScript (Track, Artist, Album...)
 │   └── schemas.ts               # Schémas Zod pour validation des réponses
+├── pages/
+│   ├── base-page.ts              # Navigation commune, héritée par toutes les pages
+│   ├── home-page.ts              # Flow par défaut + accès création playlist
+│   ├── search-page.ts            # Recherche, résultats artiste et tracks
+│   ├── artist-page.ts            # Fiche artiste
+│   ├── playlist-creation-modal.ts # Choix type playlist, cover, nom, confirmation
+│   ├── playlist-page.ts          # Titre, URL, vérification contenu playlist
+│   └── track-context-menu.ts     # Ajout d'une track à une playlist
 ├── scripts/
 │   ├── generate-fixtures.ts     # Script de génération de fixtures via LLM
 │   └── analyze-specs.ts         # Détection et insertion automatique des allure.id()
@@ -111,6 +119,21 @@ e2e-test → publish-e2e-report
 
 ---
 
+## 🏗️ Architecture E2E — Page Object Model
+
+Les tests E2E suivent le pattern **Page Object Model (POM) classique** : chaque page ou composant de l'interface Deezer est représenté par une classe TypeScript qui encapsule ses locators et les actions/vérifications associées. Les fichiers de test (`*.spec.ts`) ne contiennent aucun sélecteur brut — ils orchestrent des appels de méthodes métier (`searchPage.searchFor(query)`, `playlistPage.expectTrackPresent(title)`).
+
+**Bénéfices concrets sur ce projet :**
+- Un changement de sélecteur côté Deezer se corrige à un seul endroit, pas dans chaque spec qui l'utilise
+- Les tests se lisent comme une séquence d'actions métier, indépendamment du détail d'implémentation
+- Chaque Page Object peut être réutilisé dans plusieurs scénarios (`SearchPage` est consommé par 2 des 3 specs E2E)
+
+**Choix d'architecture assumé :** le POM classique (locators + actions + assertions dans la même classe) a été préféré au Screenplay Pattern, plus adapté à des suites de tests volumineuses avec réutilisation de locators entre rôles utilisateurs — un cas d'usage qui ne se justifie pas encore à cette échelle de projet.
+
+**Dette technique documentée :** trois méthodes liées aux résultats de recherche (`getFirstTrackTitle()`, `openFirstTrackContextMenu()`, `scrollToSearchResultsSection()`) vivent temporairement dans `SearchPage`, en attendant une future `DataGridPage` dédiée à la grille de résultats — un refactoring identifié mais volontairement reporté.
+
+---
+
 ## 📊 Rapports de test
 
 | Suite | Lien |
@@ -165,6 +188,7 @@ Step 3 - [Result] Search result page is displayed and artist is found as Best Re
 Step 4 - [Action] Click on Artist Best Result
 Step 5 - [Result] The right artist page is displayed
 ```
+**Retour d'expérience sur le refactoring POM :** la migration des specs E2E vers le pattern Page Object Model a été menée par prompting itératif, en fournissant à l'IA un Page Object déjà validé comme référence de style. Cette approche s'est révélée nettement plus fiable que le prompting par screenshots utilisé initialement pour la génération de `create-playlist-add-track.spec.ts` — sur ce scénario complexe (gestion conditionnelle d'une modale, recherche dans un sous-menu), les captures d'écran seules produisaient une instabilité importante dans le choix des sélecteurs, nécessitant de nombreuses retouches manuelles.
 
 ### 3. Assistance itérative au code
 
@@ -189,6 +213,6 @@ La réponse du LLM est systématiquement validée par Zod avant écriture sur di
 Les métriques du projet (couverture d'endpoints, temps de réponse, fixtures générées) sont suivies dans [METRICS.md](./METRICS.md).
 
 > Stack IA utilisée :
-> - Claude (Anthropic) — modèle Sonnet
+> - Claude (Anthropic) — modèle Sonnet (4.6, 5)
 > - Cursor AI — modèle Composer 2.5
 > - Copilot (Microsoft) — modèle Smart
