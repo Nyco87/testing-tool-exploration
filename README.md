@@ -63,16 +63,16 @@ testing-tool-exploration/
     │   ├── track.spec.ts                # Tests endpoint /track
     │   ├── response-time.spec.ts        # Tests temps de réponse
     │   └── search-data-driven.spec.ts   # Tests data-driven (fixtures JSON)
-    └── e2e/
-        ├── auth.setup.ts                # Login + session (storageState)
-        ├── flow.spec.ts                 # Scénario : jouer le Flow depuis la home
-        ├── search-artist.spec.ts        # Scénario : rechercher un artiste
-        └── create-playlist-add-track.spec.ts  # Scénario : créer une playlist et ajouter une track
-    ├── performance/
-    │   ├── search.js             # Charge nominale endpoint /search
-    │   ├── artist.js             # Charge nominale endpoint /artist
-    │   ├── charts.js             # Charge nominale endpoint /chart
-    │   └── traffic-spike.js      # Ramp-up 1→50 VUs, distingue vraies erreurs et rate limit
+    ├── e2e/
+    |   ├── auth.setup.ts                # Login + session (storageState)
+    |   ├── flow.spec.ts                 # Scénario : jouer le Flow depuis la home
+    |   ├── search-artist.spec.ts        # Scénario : rechercher un artiste
+    |   └── create-playlist-add-track.spec.ts  # Scénario : créer une playlist et ajouter une track
+    └── performance/
+        ├── search.js             # Charge nominale endpoint /search
+        ├── artist.js             # Charge nominale endpoint /artist
+        ├── charts.js             # Charge nominale endpoint /chart
+        └── traffic-spike.js      # Ramp-up 1→50 VUs, distingue vraies erreurs et rate limit
 ```
 
 ---
