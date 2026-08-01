@@ -138,7 +138,7 @@ Les tests E2E suivent le pattern **Page Object Model (POM) classique** : chaque 
 
 | Suite | Lien |
 |---|---|
-| **API** | [Rapport Allure API](https://nyco87.github.io/testing-tool-exploration/) |
+| **API** | [Rapport Allure API](https://nyco87.github.io/testing-tool-exploration/api/) |
 | **E2E** | [Rapport Allure E2E](https://nyco87.github.io/testing-tool-exploration/e2e/) |
 
 ---
