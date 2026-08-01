@@ -1,6 +1,6 @@
 # Metrics
 
-> Last updated: July 2026 — updated manually after each significant change.
+> Last updated: August 2026 — updated manually after each significant change.
 
 ## Test Suite
 
@@ -68,3 +68,30 @@
 | `TrackContextMenu` | 3 | 2 | 1/3 |
 
 > `SearchPage` est le Page Object le plus mutualisé (recherche, résultats artiste et tracks) — 3 méthodes y sont temporairement portées (`getFirstTrackTitle`, `openFirstTrackContextMenu`, `scrollToSearchResultsSection`) en attendant l'extraction d'une future `DataGridPage` dédiée à la grille de résultats.
+
+## Performance Testing — k6
+
+| Metric | Value |
+|---|---|
+| Scripts | 4 (`search.js`, `artist.js`, `charts.js`, `traffic-spike.js`) |
+| Load profile (nominal) | 10 VUs, 30s, `sleep(1)` |
+| Load profile (spike) | ramp-up 1→50 VUs over 2min |
+
+### Nominal load — p95 vs threshold
+
+| Endpoint | p95 observed | Threshold | Status |
+|---|---|---|---|
+| /search | ~250ms | 500ms | ✅ |
+| /artist | ~240ms | 500ms | ✅ |
+| /chart | ~437ms | 1000ms | ✅ |
+
+### Traffic spike scenario
+
+| Metric | Value |
+|---|---|
+| Max VUs reached | 49 |
+| Rate limit hits | up to 58% of requests |
+| True errors (5xx, timeouts, malformed JSON) | 0% |
+| CI-blocking threshold | `true_errors rate < 1%` |
+
+> L'API Deezer applique un rate limit non documenté (HTTP 200 + `error.code: 4`, pas de 429) — le scénario de pic distingue ce throttling propre d'une vraie panne, et ne fait échouer la CI que sur les vraies erreurs.

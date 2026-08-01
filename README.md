@@ -17,6 +17,7 @@ Le sujet d'étude choisi est l'**API publique Deezer**. Ce choix est délibéré
 |---|---|
 | **TypeScript** | Typage strict, interfaces, schémas |
 | **Playwright** | Framework de test API et E2E browser |
+| **k6** | Tests de performance et de montée en charge |
 | **Zod** | Validation de schéma des réponses API |
 | **GitHub Actions** | Pipelines CI/CD (API automatique + E2E manuel) |
 | **Allure** | Rapports de test publiés sur GitHub Pages |
@@ -67,6 +68,11 @@ testing-tool-exploration/
         ├── flow.spec.ts                 # Scénario : jouer le Flow depuis la home
         ├── search-artist.spec.ts        # Scénario : rechercher un artiste
         └── create-playlist-add-track.spec.ts  # Scénario : créer une playlist et ajouter une track
+    ├── performance/
+    │   ├── search.js             # Charge nominale endpoint /search
+    │   ├── artist.js             # Charge nominale endpoint /artist
+    │   ├── charts.js             # Charge nominale endpoint /chart
+    │   └── traffic-spike.js      # Ramp-up 1→50 VUs, distingue vraies erreurs et rate limit
 ```
 
 ---
@@ -205,6 +211,29 @@ pour la search. Tu peux en proposer des nouveaux.
 ```
 
 La réponse du LLM est systématiquement validée par Zod avant écriture sur disque — l'IA génère, le schéma valide.
+
+---
+
+## ⚡ Performance Testing — k6
+
+Trois scripts couvrent la charge nominale sur les endpoints clés (`search`, `artist`, `chart`), avec des thresholds calibrés sur l'observation réelle plutôt que sur des valeurs génériques — par exemple un seuil p95 à 500ms sur `search`/`artist` alors que le p95 observé tourne autour de 250ms : une marge confortable mais pas arbitrairement large.
+
+### Découverte : le rate limit Deezer ne renvoie pas de 429
+
+L'API publique Deezer applique un rate limit non documenté qui répond en **HTTP 200** avec un corps JSON d'erreur (`{"error":{"type":"Exception","message":"Quota limit exceeded","code":4}}`), plutôt qu'un statut 429 classique. Un check basé uniquement sur le status code passe donc à côté de cette limite — il faut parser le body pour la détecter.
+
+### Scénario de pic de trafic (`traffic-spike.js`)
+
+Ramp-up progressif de 1 à 50 VUs sur 2 minutes, avec une distinction explicite entre trois cas à chaque requête :
+- **Vraie erreur** : statut 5xx, JSON invalide, ou erreur applicative autre que le rate limit
+- **Rate limit propre** : statut 200 avec `error.code === 4` — comptabilisé séparément, non pénalisant
+- **Succès nominal**
+
+Le threshold CI ne porte que sur le taux de vraies erreurs (`rate<1%`), pas sur le rate limit lui-même — l'objectif est de vérifier que l'API **dégrade proprement** sous forte charge plutôt que de casser.
+
+**Résultat observé** : jusqu'à 58% de requêtes rate-limitées sous 50 VUs, pour 0% de vraies erreurs — confirmant que Deezer absorbe le pic sans panne, uniquement en throttlant.
+
+> Les scripts k6 s'exécutent indépendamment de la suite Playwright et ne génèrent pas de rapport Allure — leur reporting est prévu via Grafana Cloud (à venir).
 
 ---
 
