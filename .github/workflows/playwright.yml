@@ -96,7 +96,7 @@ jobs:
         path: gh-pages
       continue-on-error: true
     - name: Copy Allure history
-      run: cp -r gh-pages/history allure-results/history || true
+      run: cp -r gh-pages/api/history allure-results/history || true
     - name: Setup Java for Allure
       uses: actions/setup-java@v5
       with:
