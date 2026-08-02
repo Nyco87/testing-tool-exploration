@@ -1,0 +1,1 @@
+window.__PITWALL_HISTORY__ = [{"runId":"1","generatedAt":"2026-08-02T18:00:13.088Z","testName":"artist","durationMs":31123.905278,"vusMax":10,"requests":260,"requestRate":8.353707469473042,"p95DurationMs":228.61479905000002,"avgDurationMs":179.62274080769237,"failedRequestRate":0,"checksPassRate":1,"verdict":"pass","thresholdsTotal":2,"thresholdsFailed":0}];

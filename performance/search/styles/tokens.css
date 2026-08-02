@@ -1,0 +1,120 @@
+/*
+  PITWALL — design tokens
+  Direction: calibration-certificate / drafting-table blueprint.
+  Paper-gray ground, ink-blue linework, tabular monospace readings,
+  status rendered as ink stamps rather than glowing dashboard chips.
+*/
+
+:root {
+  /* ---- surfaces ---- */
+  --paper: #f3f4f1;         /* page ground: cool, neutral gray-white — not warm cream */
+  --panel: #fbfbfa;         /* card / module surface */
+  --panel-raised: #ffffff;  /* elevated surface (hero, modals) */
+  --line: #d8dad3;          /* hairline borders */
+  --line-strong: #b9bcb2;   /* emphasised rules */
+  --grid: #dde3e2;          /* chart graticule lines */
+
+  /* ---- ink ---- */
+  --ink: #1c1e1b;           /* primary text — near-black, not pure black */
+  --ink-soft: #4b4f49;      /* secondary text */
+  --ink-muted: #7a7d75;     /* tertiary / captions */
+  --ink-faint: #a4a79d;     /* disabled, placeholder */
+
+  /* ---- signal (brand / interactive / primary trace) ---- */
+  --signal: #1f5c7a;        /* blueprint ink-blue */
+  --signal-strong: #143f54;
+  --signal-wash: #e4edf1;   /* light fill for hovers / active nav */
+  --signal-wash-strong: #cfe0e7;
+
+  /* ---- status semantics (these carry information, not decoration) ---- */
+  --pass: #3f7d53;
+  --pass-wash: #e6efe7;
+  --pass-strong: #2c5a3b;
+
+  --warn: #a4761f;
+  --warn-wash: #f4ecda;
+  --warn-strong: #7a5714;
+
+  --fail: #a8402e;
+  --fail-wash: #f5e4e0;
+  --fail-strong: #7c2e20;
+
+  /* ---- type families ---- */
+  --font-display: "Overpass", "Arial Narrow", sans-serif;
+  --font-body: "Public Sans", -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+
+  /* ---- type scale ---- */
+  --text-3xl: 2.375rem;
+  --text-2xl: 1.75rem;
+  --text-xl: 1.375rem;
+  --text-lg: 1.125rem;
+  --text-md: 1rem;
+  --text-sm: 0.875rem;
+  --text-xs: 0.75rem;
+  --text-2xs: 0.6875rem;
+
+  /* ---- spacing (8px base) ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* ---- shape ---- */
+  --radius: 3px;
+  --radius-sm: 2px;
+
+  /* ---- shadow: flat panel edge, not soft ambient drop shadow ---- */
+  --shadow-panel: 0 1px 0 rgba(28, 30, 27, 0.05), 0 0 0 1px var(--line);
+  --shadow-raised: 0 2px 6px rgba(28, 30, 27, 0.08), 0 0 0 1px var(--line);
+
+  --sidebar-w: 248px;
+  --content-max: 1180px;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Dark variant kept intentionally close to the light system's logic —
+     panels remain distinguishable "cut sheets", not a different product. */
+}
+
+/* Manual dark toggle (data-theme="dark" on <html>), off by default.
+   Print/share-first tools like this default to light; dark is opt-in. */
+html[data-theme="dark"] {
+  --paper: #17181a;
+  --panel: #1e2022;
+  --panel-raised: #24262a;
+  --line: #34373a;
+  --line-strong: #45484c;
+  --grid: #2c3033;
+
+  --ink: #eceeec;
+  --ink-soft: #c2c5c0;
+  --ink-muted: #8d9089;
+  --ink-faint: #5f625d;
+
+  --signal: #6fa9c4;
+  --signal-strong: #8fc0d8;
+  --signal-wash: #223138;
+  --signal-wash-strong: #2b4048;
+
+  --pass: #74b98a;
+  --pass-wash: #1e2c22;
+  --pass-strong: #93cfa5;
+
+  --warn: #d3ab5b;
+  --warn-wash: #2e2919;
+  --warn-strong: #e2bf7d;
+
+  --fail: #d97c68;
+  --fail-wash: #331f1a;
+  --fail-strong: #e69983;
+
+  --shadow-panel: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px var(--line);
+  --shadow-raised: 0 2px 10px rgba(0, 0, 0, 0.35), 0 0 0 1px var(--line);
+}
