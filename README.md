@@ -140,7 +140,7 @@ Déclenché manuellement via `workflow_dispatch` (Actions → Full Suite → Run
 
 ```
 enforce-allure-ids ─┬─→ generate-fixtures → playwright-test → publish-report
-                     └─→ e2e-test → publish-e2e-report
+                    └─→ e2e-test → publish-e2e-report
 
 performance-test (indépendant, démarre en parallèle des deux branches ci-dessus)
 ```
