@@ -1,0 +1,278 @@
+name: Full Suite (API + E2E + Performance)
+on:
+  workflow_dispatch:
+
+jobs:
+  enforce-allure-ids:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        ref: ${{ github.head_ref }}
+    - uses: actions/setup-node@v6
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+    - name: Enforce Allure IDs
+      run: npx ts-node scripts/analyze-specs.ts
+    - name: Create PR for missing Allure IDs
+      id: create-pr
+      uses: peter-evans/create-pull-request@v7
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "chore: add missing allure ids"
+        title: "chore: add missing allure ids"
+        body: "Automatic insertion of missing Allure IDs by the CI pipeline."
+        branch: "chore/allure-ids"
+        delete-branch: true
+    - name: Approve and merge PR
+      if: steps.create-pr.outputs.pull-request-number != ''
+      run: |
+        gh pr merge chore/allure-ids --squash --auto
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── API ──
+  generate-fixtures:
+    needs: enforce-allure-ids
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v6
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+    - name: Generate AI fixtures
+      run: npm run generate:fixtures
+    - uses: actions/upload-artifact@v7
+      with:
+        name: ai-fixtures
+        path: fixtures/ai-generated-search-cases.json
+        retention-days: 15
+
+  playwright-test:
+    needs: generate-fixtures
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/download-artifact@v8
+      with:
+        name: ai-fixtures
+        path: fixtures/
+    - uses: actions/setup-node@v6
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      run: npx playwright test --project=api
+    - uses: actions/upload-artifact@v7
+      if: ${{ !cancelled() }}
+      with:
+        name: allure-results
+        path: allure-results/
+        retention-days: 15
+
+  publish-report:
+    needs: playwright-test
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v8
+      with:
+        name: allure-results
+        path: allure-results/
+    - uses: actions/checkout@v7
+      with:
+        ref: gh-pages
+        path: gh-pages
+      continue-on-error: true
+    - name: Copy Allure history
+      run: cp -r gh-pages/api/history allure-results/history || true
+    - name: Setup Java for Allure
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+    - name: Install Allure
+      run: npm install -g allure-commandline
+    - name: Generate Allure report
+      run: allure generate allure-results --clean -o allure-report
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./allure-report
+        destination_dir: api
+        keep_files: true
+
+  # ── E2E ──
+  e2e-test:
+    needs: enforce-allure-ids
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v6
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run E2E setup + tests
+      run: npx playwright test --project=setup --project=e2e
+      env:
+        DEEZER_EMAIL: ${{ secrets.DEEZER_EMAIL }}
+        DEEZER_PASSWORD: ${{ secrets.DEEZER_PASSWORD }}
+    - uses: actions/upload-artifact@v7
+      if: ${{ !cancelled() }}
+      with:
+        name: allure-results-e2e
+        path: allure-results/
+        retention-days: 15
+
+  publish-e2e-report:
+    needs: e2e-test
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v8
+      with:
+        name: allure-results-e2e
+        path: allure-results/
+    - uses: actions/checkout@v7
+      with:
+        ref: gh-pages
+        path: gh-pages
+      continue-on-error: true
+    - name: Copy Allure history
+      run: cp -r gh-pages/e2e/history allure-results/history || true
+    - name: Setup Java for Allure
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+    - name: Install Allure
+      run: npm install -g allure-commandline
+    - name: Generate Allure report
+      run: allure generate allure-results --clean -o allure-report
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./allure-report
+        destination_dir: e2e
+        keep_files: true
+
+  # ── Performance ──
+  performance-test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - uses: grafana/setup-k6-action@v1
+
+    - name: Checkout gh-pages for Pitwall history
+      uses: actions/checkout@v7
+      with:
+        ref: gh-pages
+        path: gh-pages
+      continue-on-error: true
+
+    - name: Run k6 - search
+      id: run-search
+      run: k6 run --out json=results-search.json tests/performance/search.js
+      continue-on-error: true
+
+    - name: Run k6 - artist
+      id: run-artist
+      run: k6 run --out json=results-artist.json tests/performance/artist.js
+      continue-on-error: true
+
+    - name: Run k6 - charts
+      id: run-charts
+      run: k6 run --out json=results-charts.json tests/performance/charts.js
+      continue-on-error: true
+
+    - name: Run k6 - traffic spike
+      id: run-spike
+      run: k6 run --out json=results-traffic-spike.json tests/performance/traffic-spike.js
+      continue-on-error: true
+
+    - name: Install Pitwall
+      run: npm install -g pitwall-k6
+
+    - name: Restore + generate report - search
+      run: |
+        mkdir -p pitwall-report/search/history
+        cp -r gh-pages/performance/search/history/* pitwall-report/search/history/ 2>/dev/null || true
+        npx pitwall-k6 generate results-search.json summary-search.json \
+          -o pitwall-report/search --name search --run-id ${{ github.run_number }} \
+          --md-summary summary-search.md
+
+    - name: Restore + generate report - artist
+      run: |
+        mkdir -p pitwall-report/artist/history
+        cp -r gh-pages/performance/artist/history/* pitwall-report/artist/history/ 2>/dev/null || true
+        npx pitwall-k6 generate results-artist.json summary-artist.json \
+          -o pitwall-report/artist --name artist --run-id ${{ github.run_number }} \
+          --md-summary summary-artist.md
+
+    - name: Restore + generate report - charts
+      run: |
+        mkdir -p pitwall-report/charts/history
+        cp -r gh-pages/performance/charts/history/* pitwall-report/charts/history/ 2>/dev/null || true
+        npx pitwall-k6 generate results-charts.json summary-charts.json \
+          -o pitwall-report/charts --name charts --run-id ${{ github.run_number }} \
+          --md-summary summary-charts.md
+
+    - name: Restore + generate report - traffic spike
+      run: |
+        mkdir -p pitwall-report/traffic-spike/history
+        cp -r gh-pages/performance/traffic-spike/history/* pitwall-report/traffic-spike/history/ 2>/dev/null || true
+        npx pitwall-k6 generate results-traffic-spike.json summary-traffic-spike.json \
+          -o pitwall-report/traffic-spike --name traffic-spike --run-id ${{ github.run_number }} \
+          --md-summary summary-traffic-spike.md
+
+    - name: Post summaries to job page
+      if: always()
+      run: |
+        for f in summary-search.md summary-artist.md summary-charts.md summary-traffic-spike.md; do
+          [ -f "$f" ] && cat "$f" >> "$GITHUB_STEP_SUMMARY"
+        done
+
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: pitwall-reports
+        path: pitwall-report/
+        retention-days: 15
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./pitwall-report
+        destination_dir: performance
+        keep_files: true
+
+    - name: Fail job if any k6 threshold was breached
+      if: |
+        steps.run-search.outcome == 'failure' ||
+        steps.run-artist.outcome == 'failure' ||
+        steps.run-charts.outcome == 'failure' ||
+        steps.run-spike.outcome == 'failure'
+      run: |
+        echo "At least one k6 scenario has breached its threshold — see the logs above."
+        exit 1
