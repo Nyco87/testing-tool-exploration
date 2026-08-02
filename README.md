@@ -1,5 +1,12 @@
-![CI](https://github.com/Nyco87/testing-tool-exploration/actions/workflows/playwright.yml/badge.svg)
-![E2E](https://github.com/Nyco87/testing-tool-exploration/actions/workflows/e2e.yml/badge.svg)
+<p align="center">
+  <img src="https://github.com/Nyco87/testing-tool-exploration/actions/workflows/playwright.yml/badge.svg" alt="CI">
+  <img src="https://github.com/Nyco87/testing-tool-exploration/actions/workflows/e2e.yml/badge.svg" alt="E2E">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/license/Nyco87/testing-tool-exploration" alt="GitHub license">
+</p>
+
 
 # testing-tool-exploration
 
@@ -21,6 +28,7 @@ Le sujet d'étude choisi est l'**API publique Deezer**. Ce choix est délibéré
 | **Zod** | Validation de schéma des réponses API |
 | **GitHub Actions** | Pipelines CI/CD (API automatique + E2E manuel) |
 | **Allure** | Rapports de test publiés sur GitHub Pages |
+| **Pitwall** | Rapport HTML + historique pour les tests k6 |
 | **ts-node** | Exécution des scripts TypeScript sans compilation |
 
 ---
@@ -125,6 +133,23 @@ e2e-test → publish-e2e-report
 
 ---
 
+### Pipeline complet — manuel
+
+Déclenché manuellement via `workflow_dispatch` (Actions → Full Suite → Run workflow). Lance API, E2E et Performance dans le même run, chacun sur sa propre branche de jobs indépendante.
+
+```
+enforce-allure-ids ─┬─→ generate-fixtures → playwright-test → publish-report
+                     └─→ e2e-test → publish-e2e-report
+
+performance-test (indépendant, démarre en parallèle des deux branches ci-dessus)
+```
+
+1. **enforce-allure-ids** — prérequis partagé par les branches API et E2E
+2. **performance-test** — exécute les 4 scripts k6 **séquentiellement** (pas en parallèle) pour éviter que les charges cumulées ne se contaminent (rate limit prématuré, p95 faussé) ; génère un rapport [Pitwall](https://github.com/florin-stefan/pitwall-k6) par script, avec historique persistant sur GitHub Pages sous `/performance/`
+
+> Ce workflow est un troisième fichier autonome (`full-suite.yml`), distinct de `playwright.yml` et `e2e.yml` qui continuent de fonctionner indépendamment selon leurs déclenchements habituels (push automatique / manuel séparé).
+---
+
 ## 🏗️ Architecture E2E — Page Object Model
 
 Les tests E2E suivent le pattern **Page Object Model (POM) classique** : chaque page ou composant de l'interface Deezer est représenté par une classe TypeScript qui encapsule ses locators et les actions/vérifications associées. Les fichiers de test (`*.spec.ts`) ne contiennent aucun sélecteur brut — ils orchestrent des appels de méthodes métier (`searchPage.searchFor(query)`, `playlistPage.expectTrackPresent(title)`).
@@ -146,6 +171,10 @@ Les tests E2E suivent le pattern **Page Object Model (POM) classique** : chaque 
 |---|---|
 | **API** | [Rapport Allure API](https://nyco87.github.io/testing-tool-exploration/api/) |
 | **E2E** | [Rapport Allure E2E](https://nyco87.github.io/testing-tool-exploration/e2e/) |
+| **Performance — search** | [Rapport Pitwall](https://nyco87.github.io/testing-tool-exploration/performance/search/) |
+| **Performance — artist** | [Rapport Pitwall](https://nyco87.github.io/testing-tool-exploration/performance/artist/) |
+| **Performance — charts** | [Rapport Pitwall](https://nyco87.github.io/testing-tool-exploration/performance/charts/) |
+| **Performance — traffic spike** | [Rapport Pitwall](https://nyco87.github.io/testing-tool-exploration/performance/traffic-spike/) |
 
 ---
 
