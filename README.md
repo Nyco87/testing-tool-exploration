@@ -41,6 +41,7 @@ testing-tool-exploration/
 │   └── workflows/
 │       ├── playwright.yml       # Pipeline CI/CD API (automatique)
 │       └── e2e.yml              # Pipeline E2E (déclenchement manuel)
+│       └── full-suite.yml       # Pipeline Complet: API, E2E & Performance (déclenchement manuel)
 ├── auth/
 │   └── .gitkeep                 # Dossier pour session.json (ignoré par git)
 ├── docs/
