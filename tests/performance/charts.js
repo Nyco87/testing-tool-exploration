@@ -26,3 +26,7 @@ export default function () {
 
     sleep(1); 
 }
+
+export function handleSummary(data) {
+    return { 'summary-charts.json': JSON.stringify(data) };
+}

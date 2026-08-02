@@ -25,3 +25,7 @@ export default function () {
 
     sleep(1); // pause de 1 seconde entre les itérations
 }
+
+export function handleSummary(data) {
+    return { 'summary-search.json': JSON.stringify(data) };
+}

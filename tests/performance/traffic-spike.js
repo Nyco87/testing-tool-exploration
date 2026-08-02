@@ -46,3 +46,7 @@ export default function () {
 
     sleep(1);
 }
+
+export function handleSummary(data) {
+    return { 'summary-traffic-spike.json': JSON.stringify(data) };
+}

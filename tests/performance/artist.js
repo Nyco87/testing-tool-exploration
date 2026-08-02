@@ -22,3 +22,7 @@ export default function () {
 
     sleep(1);
 }
+
+export function handleSummary(data) {
+    return { 'summary-artist.json': JSON.stringify(data) };
+}
